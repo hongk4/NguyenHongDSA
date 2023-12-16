@@ -11,6 +11,9 @@ import java.util.Scanner;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.Color;
+import javax.swing.JColorChooser;
 
 public class TextDemo extends JPanel implements ActionListener {
     protected JTextField textField;
@@ -19,28 +22,28 @@ public class TextDemo extends JPanel implements ActionListener {
     private JCheckBox darkModeCheckBox;
     private final static String newline = "\n";
     private static Trie trie;
-    public void runRealTime(JTextField textField){
+    private Color selectedTextColor = Color.RED;
+
+    public void runRealTime(JTextField textField) {
         textField.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
             public void removeUpdate(DocumentEvent e) {
                 addTextToArea();
-
             }
+
             private void addTextToArea() {
                 System.out.println(textField.getText());
                 List<Pair<String, String>> lt = trie.suggest(textField.getText());
                 textArea.setText("");
-                for(Pair<String, String> i : lt){
+                for (Pair<String, String> i : lt) {
                     textArea.append(i.getFirst() + ": " + i.getSecond() + "\n");
                 }
-
             }
 
             @Override
             public void insertUpdate(DocumentEvent e) {
                 addTextToArea();
-
             }
 
             @Override
@@ -53,7 +56,6 @@ public class TextDemo extends JPanel implements ActionListener {
     public TextDemo() {
         super(new GridBagLayout());
 
-        // Thêm clearButton và textField vào panel
         JPanel inputPanel = new JPanel(new BorderLayout());
         textField = new JTextField(20);
         this.runRealTime(textField);
@@ -64,8 +66,15 @@ public class TextDemo extends JPanel implements ActionListener {
         textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);
         JButton clearButton = new JButton("X");
-        JButton saveButton = new JButton("Save"); // Thêm nút Save
+        JButton saveButton = new JButton("Save");
         darkModeCheckBox = new JCheckBox("Dark Mode");
+        JButton colorButton = new JButton("Color");
+        colorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectColor();
+            }
+        });
         darkModeCheckBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -77,7 +86,6 @@ public class TextDemo extends JPanel implements ActionListener {
         clearButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Xóa nội dung của textField khi nút được nhấn
                 textField.setText("");
             }
         });
@@ -90,11 +98,10 @@ public class TextDemo extends JPanel implements ActionListener {
         });
 
         inputPanel.add(clearButton, BorderLayout.EAST);
-        inputPanel.add(saveButton, BorderLayout.WEST); // Thêm nút Save
+        inputPanel.add(saveButton, BorderLayout.WEST);
 
-        // Thêm JComboBox để chọn kích thước chữ và Dark Mode checkbox
         fontSizeComboBox = new JComboBox<>();
-        for (int i = 10; i <= 24; i++) {
+        for (int i = 10; i <= 30; i++) {
             fontSizeComboBox.addItem(i);
         }
         fontSizeComboBox.setSelectedItem(16);
@@ -116,6 +123,8 @@ public class TextDemo extends JPanel implements ActionListener {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
         add(fontSizeComboBox, c);
+        c.insets = new Insets(0, 5, 0, 0);
+        add(colorButton, c);
 
         c.gridwidth = GridBagConstraints.REMAINDER;
         add(darkModeCheckBox, c);
@@ -127,14 +136,38 @@ public class TextDemo extends JPanel implements ActionListener {
         c.weighty = 1.0;
         add(scrollPane, c);
     }
+    private void selectColor() {
+        Color selectedColor = JColorChooser.showDialog(this, "Choose Text Color", selectedTextColor);
+        if (selectedColor != null) {
+            selectedTextColor = selectedColor;
+            textField.setForeground(selectedTextColor);
+            textArea.setForeground(selectedTextColor);
+        }
+    }
 
     private void saveToFile() {
         JFileChooser fileChooser = new JFileChooser();
+
+        FileNameExtensionFilter txtFilter = new FileNameExtensionFilter("Text Files (*.txt)", "txt");
+        FileNameExtensionFilter allFilter = new FileNameExtensionFilter("All Files", "*.*");
+
+        fileChooser.addChoosableFileFilter(txtFilter);
+        fileChooser.addChoosableFileFilter(allFilter);
+
+        fileChooser.setFileFilter(txtFilter);
+
         int result = fileChooser.showSaveDialog(this);
 
         if (result == JFileChooser.APPROVE_OPTION) {
             try {
                 File file = fileChooser.getSelectedFile();
+
+                String filePath = file.getAbsolutePath();
+                FileNameExtensionFilter selectedFilter = (FileNameExtensionFilter) fileChooser.getFileFilter();
+                if (!filePath.endsWith("." + selectedFilter.getExtensions()[0])) {
+                    file = new File(filePath + "." + selectedFilter.getExtensions()[0]);
+                }
+
                 FileWriter writer = new FileWriter(file);
                 writer.write(textArea.getText());
                 writer.close();
@@ -147,21 +180,21 @@ public class TextDemo extends JPanel implements ActionListener {
     }
 
 
+
     private void updateTheme() {
         if (darkModeCheckBox.isSelected()) {
-            // Chế độ tối
             textField.setBackground(Color.BLACK);
             textField.setForeground(Color.WHITE);
             textArea.setBackground(Color.BLACK);
             textArea.setForeground(Color.WHITE);
         } else {
-            // Chế độ sáng
             textField.setBackground(Color.WHITE);
             textField.setForeground(Color.BLACK);
             textArea.setBackground(Color.WHITE);
             textArea.setForeground(Color.BLACK);
         }
     }
+
 
 
 
@@ -188,7 +221,7 @@ public class TextDemo extends JPanel implements ActionListener {
     }
     public static void addToTrie(Trie trie){
         try {
-            File myObj = new File("D:\\IdeaProjects\\Nguyenhong.oop\\src\\CK\\in.txt");
+            File myObj = new File("D:\\IdeaProjects\\NguyenHong_DSA\\src\\CK\\in.txt");
             Scanner myReader = new Scanner(myObj);
             while (myReader.hasNextLine()) {
                 String data = myReader.nextLine();

@@ -23,7 +23,7 @@ public class TextDemo extends JPanel implements ActionListener {
     private final static String newline = "\n";
     private static Trie trie;
     private Color selectedTextColor = Color.RED;
-    private static final String FILE_PATH = "D:\\IdeaProjects\\NguyenHong_DSA\\src\\CK\\in.txt";
+    private static final String FILE_PATH = "in.txt";
     private JButton addWordButton;
 
     public void runRealTime(JTextField textField) {

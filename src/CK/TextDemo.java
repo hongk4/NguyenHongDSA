@@ -227,11 +227,7 @@ public class TextDemo extends JPanel implements ActionListener {
         textArea.setCaretPosition(textArea.getDocument().getLength());
     }
 
-    /**
-     * Create the GUI and show it.  For thread safety,
-     * this method should be invoked from the
-     * event dispatch thread.
-     */
+   
     private static void createAndShowGUI() {
         JFrame frame = new JFrame("TextDemo");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

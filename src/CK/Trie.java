@@ -33,7 +33,7 @@ public class Trie {
         Node p = root;
         for (int i = 0; i < en.length(); ++i) {
             int x = charToInt(en.charAt(i));
-            if(x < 0 || x >= 27) continue;
+            if (x < 0 || x >= 27) continue;
             if (p.child[x] == null)
                 p.child[x] = new Node();
             p = p.child[x];
@@ -58,6 +58,7 @@ public class Trie {
     public void delete(String en) {
         delete(root, en, 0);
     }
+
     private boolean delete(Node current, String en, int depth) {
         int childArraySize = current.child.length;
         if (depth == en.length()) {
@@ -124,8 +125,8 @@ public class Trie {
     }
 
     //    suggest 20 word has common prefix with string prefix
-    public List<Pair<String,String >> suggest(String prefix) {
-        List<Pair<String,String>> list = new ArrayList<>();
+    public List<Pair<String, String>> suggest(String prefix) {
+        List<Pair<String, String>> list = new ArrayList<>();
         Node p = endNode(prefix);
         getCandidates(p, prefix, list);
         return list;
@@ -142,11 +143,11 @@ public class Trie {
         return p;
     }
 
-    private void getCandidates(Node p, String str, List<Pair<String,String>> list) {
-        if(p.isEndWord) {
+    private void getCandidates(Node p, String str, List<Pair<String, String>> list) {
+        if (p.isEndWord) {
             list.add(new Pair<>(str, p.meaning));
         }
-        if(list.size() > 10)
+        if (list.size() > 10)
             return;
         for (int i = 0; i < 27; ++i) {
             if (p.child[i] != null) {
